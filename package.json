@@ -1,55 +1,23 @@
 {
-  "name": "chat-adapter-qqbot",
-  "version": "0.1.0",
-  "description": "QQbot adapter for Chat SDK",
+  "name": "chat-adapters",
+  "private": true,
   "type": "module",
-  "main": "./dist/index.js",
-  "module": "./dist/index.js",
-  "types": "./dist/index.d.ts",
-  "exports": {
-    ".": {
-      "types": "./dist/index.d.ts",
-      "import": "./dist/index.js"
-    }
-  },
-  "files": [
-    "dist"
-  ],
   "scripts": {
-    "build": "tsup",
+    "build": "pnpm -r build",
     "check": "biome check .",
     "check:fix": "biome check --write .",
     "format": "biome format --write .",
     "lint": "biome lint .",
-    "dev": "tsup --watch",
-    "test": "vitest run",
-    "test:watch": "vitest",
-    "typecheck": "tsc --noEmit && tsc -p tsconfig.examples.json",
-    "example:websocket": "tsx --env-file=.env examples/websocket-bot.ts",
-    "clean": "rm -rf dist"
-  },
-  "peerDependencies": {
-    "chat": "^4.0.0"
-  },
-  "dependencies": {
-    "@chat-adapter/shared": "^4.32.0"
+    "test": "pnpm -r test",
+    "typecheck": "pnpm -r typecheck",
+    "clean": "pnpm -r clean"
   },
   "devDependencies": {
-    "@biomejs/biome": "^2.5.2",
-    "@types/node": "^22.20.0",
-    "chat": "^4.32.0",
-    "tsup": "^8.5.1",
-    "tsx": "^4.8.1",
-    "typescript": "^5.9.3",
-    "vitest": "^4.1.9"
-  },
-  "publishConfig": {
-    "access": "public"
-  },
-  "keywords": [
-    "chat-sdk",
-    "chat-adapter",
-    "qqbot"
-  ],
-  "license": "MIT"
+    "@biomejs/biome": "catalog:",
+    "@types/node": "catalog:",
+    "tsup": "catalog:",
+    "tsx": "catalog:",
+    "typescript": "catalog:",
+    "vitest": "catalog:"
+  }
 }

@@ -1,2 +1,17 @@
+packages:
+  - "packages/*"
+  - "examples/*"
+
+catalog:
+  "@biomejs/biome": "^2.5.2"
+  "@chat-adapter/shared": "^4.32.0"
+  "@chat-adapter/state-memory": "^4.32.0"
+  "@types/node": "^22.20.0"
+  chat: "^4.32.0"
+  tsup: "^8.5.1"
+  tsx: "^4.8.1"
+  typescript: "^5.9.3"
+  vitest: "^4.1.9"
+
 allowBuilds:
   esbuild: true
