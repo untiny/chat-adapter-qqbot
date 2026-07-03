@@ -98,8 +98,8 @@ export class QQBotClient {
         body: payload,
       });
     }
-    if (thread.guildId) {
-      return this.request(`/dms/${thread.guildId}/messages`, {
+    if (thread.kind === "dms") {
+      return this.request(`/dms/${required(thread.guildId, "guildId")}/messages`, {
         method: "POST",
         body: payload,
       });
@@ -140,6 +140,13 @@ export class QQBotClient {
     if (thread.kind === "group") {
       await this.request(
         `/v2/groups/${required(thread.groupOpenId, "groupOpenId")}/messages/${messageId}`,
+        { method: "DELETE" },
+      );
+      return;
+    }
+    if (thread.kind === "dms") {
+      await this.request(
+        `/dms/${required(thread.guildId, "guildId")}/messages/${messageId}`,
         { method: "DELETE" },
       );
       return;
@@ -253,6 +260,13 @@ export class QQBotClient {
     }
     if (thread.kind === "group") {
       return this.request(`/v2/groups/${required(thread.groupOpenId, "groupOpenId")}/files`, {
+        method: "POST",
+        body: formData,
+        rawBody: true,
+      });
+    }
+    if (thread.kind === "dms") {
+      return this.request(`/dms/${required(thread.guildId, "guildId")}/files`, {
         method: "POST",
         body: formData,
         rawBody: true,

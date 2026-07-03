@@ -61,7 +61,7 @@ export function threadFromMessage(message: QQBotMessage): QQBotThreadId {
   const userOpenId = userIdFromQQBotUser(message.author ?? message.member?.user);
   if (message.direct_message || message.src_guild_id) {
     return {
-      kind: "dm",
+      kind: "dms",
       userOpenId: userOpenId ?? message.id,
       guildId: message.guild_id ?? message.src_guild_id,
       messageId: message.id,
@@ -88,6 +88,13 @@ export function threadFromMessage(message: QQBotMessage): QQBotThreadId {
 export function threadFromInteraction(interaction: QQBotInteraction): QQBotThreadId | null {
   if (interaction.group_openid) {
     return { kind: "group", groupOpenId: interaction.group_openid };
+  }
+  if (interaction.guild_id && (interaction.user_openid || userIdFromQQBotUser(interaction.user))) {
+    return {
+      kind: "dms",
+      guildId: interaction.guild_id,
+      userOpenId: interaction.user_openid ?? userIdFromQQBotUser(interaction.user),
+    };
   }
   if (interaction.user_openid || userIdFromQQBotUser(interaction.user)) {
     return {

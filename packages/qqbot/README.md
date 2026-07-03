@@ -1,12 +1,12 @@
 # @untiny/chat-adapter-qqbot
 
-QQBot adapter for Chat SDK. It connects QQBot guild channels, groups, and C2C direct messages to the Chat SDK adapter interface, with support for webhook and Gateway WebSocket transports.
+QQBot adapter for Chat SDK. It connects QQBot guild channels, groups, C2C direct messages, and guild direct messages to the Chat SDK adapter interface, with support for webhook and Gateway WebSocket transports.
 
 ## Features
 
 - Chat SDK adapter implementation for QQBot.
 - Webhook and WebSocket event transports.
-- Guild channel, group, and direct/C2C thread routing.
+- Guild channel, group, C2C direct, and guild direct thread routing.
 - Message sending, editing, deletion/recall, reactions, typing indicators, and message fetching where supported by QQBot APIs.
 - File/media upload for outgoing messages.
 - Chat SDK formatted content and card fallback rendering.
@@ -140,7 +140,7 @@ Start the example:
 pnpm --filter @chat-adapter-examples/qqbot websocket
 ```
 
-The script loads environment variables from the project root `.env` file before it starts. The example calls `bot.initialize()` on startup, which opens the QQBot Gateway connection in `transport: "websocket"` mode. After it is running, trigger the bot from a QQ guild channel, group, or direct/C2C message. The terminal should log the incoming event and the bot should reply with a short confirmation message. Press `Ctrl+C` to shut down and disconnect the Gateway.
+The script loads environment variables from the project root `.env` file before it starts. The example calls `bot.initialize()` on startup, which opens the QQBot Gateway connection in `transport: "websocket"` mode. After it is running, trigger the bot from a QQ guild channel, group, C2C direct message, or guild direct message. The terminal should log the incoming event and the bot should reply with a short confirmation message. Press `Ctrl+C` to shut down and disconnect the Gateway.
 
 ## Thread IDs
 
@@ -167,7 +167,8 @@ Supported thread kinds:
 
 - `guild`: requires `guildId` and `channelId`.
 - `group`: requires `groupOpenId`.
-- `dm`: requires `userOpenId`.
+- `dm`: requires `userOpenId` and represents C2C direct messages routed through `/v2/users/{user_openid}/messages`.
+- `dms`: requires `guildId` and `userOpenId` and represents guild direct messages routed through `/dms/{guild_id}/messages`.
 
 ## Button Data
 

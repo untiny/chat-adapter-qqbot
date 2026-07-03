@@ -26,33 +26,27 @@ function describeIntents(value: number): string[] {
   return intentNames.filter(([intent]) => (value & intent) === intent).map(([, name]) => name);
 }
 
+const qqbot = createQQBotAdapter({
+  transport: "websocket",
+});
+
 const bot = new Chat({
   userName: process.env.QQ_BOT_USER_NAME ?? "qqbot",
   adapters: {
-    qqbot: createQQBotAdapter({
-      transport: "websocket",
-    }),
+    qqbot,
   },
   state: createMemoryState(),
 });
 
 bot.onNewMention(async (thread, message) => {
-  console.log("[qqbot:new-mention]", {
-    threadId: thread.id,
-    messageId: message.id,
-    text: message.text,
-  });
+  console.log("[qqbot:new-mention]", message);
   await thread.subscribe();
   await thread.post(`Received your mention: ${message.text || "(no text)"}`);
 });
 
 bot.onDirectMessage(async (thread, message) => {
-  console.log("[qqbot:direct-message]", {
-    threadId: thread.id,
-    messageId: message.id,
-    text: message.text,
-  });
-  await thread.post(`Received your direct message: ${message.text || "(no text)"}`);
+  console.log("[qqbot:direct-message]", message);
+  await thread.post({ markdown: `Received your direct message: ${message.text || "(no text)"}` });
 });
 
 bot.onNewMessage(/[\s\S]*/, async (thread, message) => {
@@ -107,4 +101,15 @@ try {
     );
   }
   process.exit(1);
+}
+
+// 主动发送消息
+const targetUserOpenId = process.env.QQ_BOT_TEST_USER_OPENID ?? "E173B287005594137E2669DD6682DA89";
+
+try {
+  const dmThreadId = await qqbot.openDM(targetUserOpenId);
+  const dmThread = bot.thread(dmThreadId);
+  await dmThread.post({ markdown: "嗨" });
+} catch (error) {
+  console.error("Failed to send message.", error);
 }

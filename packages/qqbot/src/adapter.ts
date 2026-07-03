@@ -120,9 +120,8 @@ export class QQBotAdapter implements Adapter<QQBotThreadId, QQBotRawMessage> {
     const decoded = this.decodeThreadId(threadId);
     if (decoded.kind === "guild") return `qqbot:guild:${decoded.guildId}:${decoded.channelId}`;
     if (decoded.kind === "group") return `qqbot:group:${decoded.groupOpenId}`;
-    return decoded.guildId
-      ? `qqbot:dm:${decoded.guildId}:${decoded.userOpenId}`
-      : `qqbot:dm:${decoded.userOpenId}`;
+    if (decoded.kind === "dms") return `qqbot:dms:${decoded.guildId}:${decoded.userOpenId}`;
+    return `qqbot:dm:${decoded.userOpenId}`;
   }
 
   /**
@@ -161,7 +160,7 @@ export class QQBotAdapter implements Adapter<QQBotThreadId, QQBotRawMessage> {
     return createMessageFromQQBot(this, data as QQBotMessage);
   }
 
-  /** Post a message to a guild channel, group chat, or direct/C2C thread. */
+  /** Post a message to a guild channel, group chat, C2C DM, or guild DM thread. */
   async postMessage(
     threadId: string,
     message: AdapterPostableMessage,
@@ -277,18 +276,22 @@ export class QQBotAdapter implements Adapter<QQBotThreadId, QQBotRawMessage> {
         throw validationError("QQBot group thread is missing groupOpenId.");
       }
       channelId = decoded.groupOpenId;
+    } else if (decoded.kind === "dms") {
+      if (!decoded.guildId) {
+        throw validationError("QQBot guild DM thread is missing guildId.");
+      }
+      channelId = decoded.guildId;
     } else {
-      const dmChannelId = decoded.guildId ?? decoded.userOpenId;
-      if (!dmChannelId) {
+      if (!decoded.userOpenId) {
         throw validationError("QQBot DM thread is missing userOpenId.");
       }
-      channelId = dmChannelId;
+      channelId = decoded.userOpenId;
     }
     return {
       id: threadId,
       channelId,
       channelName: channelId,
-      isDM: decoded.kind === "dm",
+      isDM: decoded.kind === "dm" || decoded.kind === "dms",
       metadata: decoded as unknown as Record<string, unknown>,
     };
   }
@@ -335,9 +338,10 @@ export class QQBotAdapter implements Adapter<QQBotThreadId, QQBotRawMessage> {
     return this.encodeThreadId({ kind: "dm", userOpenId: userId });
   }
 
-  /** Check whether a Chat SDK thread ID represents a QQ direct/C2C chat. */
+  /** Check whether a Chat SDK thread ID represents a QQ private chat. */
   isDM(threadId: string): boolean {
-    return this.decodeThreadId(threadId).kind === "dm";
+    const kind = this.decodeThreadId(threadId).kind;
+    return kind === "dm" || kind === "dms";
   }
 
   /**

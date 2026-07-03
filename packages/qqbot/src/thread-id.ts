@@ -42,6 +42,21 @@ export function encodeQQBotThreadId(data: QQBotThreadId): string {
       .join(":");
   }
 
+  if (data.kind === "dms") {
+    if (!data.guildId || !data.userOpenId) {
+      throw validationError("QQBot guild DM thread IDs require guildId and userOpenId.");
+    }
+    return [
+      PREFIX,
+      "dms",
+      data.guildId,
+      data.userOpenId,
+      data.messageId ? encodeSegment(data.messageId) : undefined,
+    ]
+      .filter(Boolean)
+      .join(":");
+  }
+
   if (!data.userOpenId) {
     throw validationError("QQBot DM thread IDs require userOpenId.");
   }
@@ -49,7 +64,6 @@ export function encodeQQBotThreadId(data: QQBotThreadId): string {
     PREFIX,
     "dm",
     data.userOpenId,
-    data.guildId,
     data.messageId ? encodeSegment(data.messageId) : undefined,
   ]
     .filter(Boolean)
@@ -84,16 +98,26 @@ export function decodeQQBotThreadId(threadId: string): QQBotThreadId {
     };
   }
 
+  if (kind === "dms") {
+    if (parts.length < 4 || parts.length > 5) {
+      throw validationError(`Invalid QQBot guild DM thread ID: ${threadId}`);
+    }
+    return {
+      kind,
+      guildId: parts[2],
+      userOpenId: parts[3],
+      messageId: parts[4] ? decodeSegment(parts[4]) : undefined,
+    };
+  }
+
   if (kind === "dm") {
+    if (parts.length > 4) {
+      throw validationError(`Invalid QQBot DM thread ID: ${threadId}`);
+    }
     return {
       kind,
       userOpenId: parts[2],
-      guildId: parts[4] ? parts[3] : undefined,
-      messageId: parts[4]
-        ? decodeSegment(parts[4])
-        : parts[3]
-          ? decodeSegment(parts[3])
-          : undefined,
+      messageId: parts[3] ? decodeSegment(parts[3]) : undefined,
     };
   }
 

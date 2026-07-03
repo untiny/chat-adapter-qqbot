@@ -73,12 +73,36 @@ describe("QQBotClient", () => {
     });
 
     await client.postMessage(
-      { kind: "dm", userOpenId: "user", guildId: "guild", messageId: "incoming-msg" },
+      { kind: "dms", userOpenId: "user", guildId: "guild", messageId: "incoming-msg" },
       { content: "hello", msg_id: "incoming-msg" },
     );
 
     expect(fetchMock).toHaveBeenCalledWith(
       "https://api.example.com/dms/guild/messages",
+      expect.objectContaining({
+        method: "POST",
+        body: JSON.stringify({ content: "hello", msg_id: "incoming-msg" }),
+      }),
+    );
+  });
+
+  it("posts C2C direct messages through the v2 user endpoint", async () => {
+    const fetchMock = vi.fn().mockResolvedValue(jsonResponse({ id: "msg-1" }));
+    const client = new QQBotClient({
+      appId: "app",
+      secret: "secret",
+      token: "token",
+      apiBaseUrl: "https://api.example.com",
+      fetch: fetchMock,
+    });
+
+    await client.postMessage(
+      { kind: "dm", userOpenId: "user", messageId: "incoming-msg" },
+      { content: "hello", msg_id: "incoming-msg" },
+    );
+
+    expect(fetchMock).toHaveBeenCalledWith(
+      "https://api.example.com/v2/users/user/messages",
       expect.objectContaining({
         method: "POST",
         body: JSON.stringify({ content: "hello", msg_id: "incoming-msg" }),

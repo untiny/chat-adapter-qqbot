@@ -4,19 +4,19 @@ import type { Logger } from "chat";
 export type QQBotTransport = "auto" | "webhook" | "websocket";
 
 /** Chat surface represented by a Chat SDK thread ID. */
-export type QQBotThreadKind = "guild" | "group" | "dm";
+export type QQBotThreadKind = "guild" | "group" | "dm" | "dms";
 
 /** Decoded components of a QQBot Chat SDK thread ID. */
 export interface QQBotThreadId {
-  /** Surface type: guild channel, group chat, or direct/C2C chat. */
+  /** Surface type: guild channel, group chat, C2C direct chat, or guild direct chat. */
   kind: QQBotThreadKind;
-  /** QQ guild ID for channel messages. */
+  /** QQ guild ID for channel messages and guild direct messages. */
   guildId?: string;
   /** QQ channel ID for guild channel messages. */
   channelId?: string;
   /** Open ID for QQ group messages. */
   groupOpenId?: string;
-  /** Open ID for QQ C2C/direct messages. */
+  /** Open ID for QQ C2C users or guild direct message recipients. */
   userOpenId?: string;
   /** Optional source/root message ID used for replies. */
   messageId?: string;

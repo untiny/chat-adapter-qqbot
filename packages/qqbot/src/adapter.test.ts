@@ -127,9 +127,9 @@ describe("QQBotAdapter", () => {
 
     expect(response.status).toBe(200);
     const call = chat.calls.find((item) => item.name === "processMessage");
-    expect(call?.args[1]).toContain("qqbot:dm:");
+    expect(call?.args[1]).toContain("qqbot:dms:");
     expect(adapter.decodeThreadId(call?.args[1] as string)).toEqual({
-      kind: "dm",
+      kind: "dms",
       userOpenId: "user",
       guildId: "guild",
       messageId: "msg-1",
