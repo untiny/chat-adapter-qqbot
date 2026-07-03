@@ -46,6 +46,7 @@ bot.onNewMention(async (thread, message) => {
 
 bot.onDirectMessage(async (thread, message) => {
   console.log("[qqbot:direct-message]", message);
+  await thread.startTyping();
   await thread.post({ markdown: `Received your direct message: ${message.text || "(no text)"}` });
 });
 

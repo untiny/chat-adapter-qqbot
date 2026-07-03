@@ -145,10 +145,9 @@ export class QQBotClient {
       return;
     }
     if (thread.kind === "dms") {
-      await this.request(
-        `/dms/${required(thread.guildId, "guildId")}/messages/${messageId}`,
-        { method: "DELETE" },
-      );
+      await this.request(`/dms/${required(thread.guildId, "guildId")}/messages/${messageId}`, {
+        method: "DELETE",
+      });
       return;
     }
     await this.request(
@@ -215,12 +214,18 @@ export class QQBotClient {
 
   /** Send a typing signal for guild channel threads; no-op for other surfaces. */
   async startTyping(thread: QQBotThreadId): Promise<void> {
-    if (thread.kind !== "guild") {
+    if (thread.kind !== "dm") {
       return;
     }
-    await this.request(`/channels/${required(thread.channelId, "channelId")}/typing`, {
+    await this.request(`/v2/users/${required(thread.userOpenId, "userOpenId")}/messages`, {
       method: "POST",
-      body: {},
+      body: {
+        msg_type: 6,
+        input_notify: {
+          input_type: 1,
+          input_second: 60,
+        },
+      },
     });
   }
 
